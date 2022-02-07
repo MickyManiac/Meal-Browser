@@ -1,4 +1,22 @@
-# Deelopdracht 4. Installatiehandleiding
+# Installatiehandleiding
+
+## Inleiding
+
+...
+
+## Benodigdheden
+
+...
+
+## Installatie instructies
+
+...
+
+## Overige npm commando's
+
+...
+
+## Opdrachtbeschrijving installatiehandleiding
 
 In de voorgaande opdrachten heb je jouw ontwikkelwerk afgerond.
 Om ervoor te zorgen dat anderen jouw applicatie kunnen gebruiken,
