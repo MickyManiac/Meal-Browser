@@ -2,7 +2,22 @@
 
 ## Inleiding
 
-...
+Meal Browser is een web applicatie die het mogelijk maakt om naar recepten te zoeken.
+Daartoe maakt Meal Browser gebruik van de spoonacular API.
+Met deze API kan een grote hoeveelheid recepten worden doorzocht die op diverse locaties zijn gepubliceerd.  
+
+Met de functionaliteit "eenvoudig zoeken" helpt Meal Browser de gebruiker om recepten te vinden op basis van een
+zoekterm. Dit komt van pas om te zoeken naar een specifiek recept waarvan de naam grotendeels bekend is (zoals bij
+zoekterm "goat cheese salad") of naar een categorie van recepten (zoals bij zoekterm "fruit salad").  
+
+Met de functionaliteit "uitgebreid zoeken" kan de gebruiker een aantal zoekcriteria gebruiken om te zoeken naar
+recepten met de gewenste eigenschappen. Zo kan bijvoorbeeld worden gezocht naar een vegetarische pizza die binnen 60
+minuten bereid kan worden.
+
+Ten slotte kan de gebruiker zich laten inspireren door een actueel overzicht van zeer populaire recepten, die bij
+menige tafelgast in de smaak zullen vallen.  
+
+De ontwikkeling van Meal Browser vond plaats als opdracht in het kader van de opleiding Front End Development.
 
 ## Benodigdheden
 
