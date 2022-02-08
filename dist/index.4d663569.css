@@ -1,4 +1,16 @@
+div.plan {
+    padding: 5px;
+    color: darkseagreen;
+    font-style: italic;
+}
+
 h1 {
     background-color: slategrey;
+}
+
+#simple-search-help-text {
+    padding: 5px;
+    color: red;
+    font-weight: bold;
 }
 /*# sourceMappingURL=index.4d663569.css.map */

@@ -8,12 +8,16 @@
 <body>
 <h1>Eenvoudig zoeken naar recepten</h1>
 <hr>
-<div>Voer een zoekterm in.</div>
-<input type="text" id="zoekterm"><button id="zoektermknop">Zoeken</button>
-<div id="searchhelp"></div>
-<div>Hieronder komen de resultaten. Aanvankelijk staat hier niets. Elk resultaat staat in een aanklikbare box die eventueel kan worden weggeklikt.</div>
+<div>Vul een zoekterm in.</div>
+<form id="simple-search-form">
+    <input type="text" name="text-query" id="text-query-field" placeholder="Jouw zoekterm">
+    <button type="submit">Zoeken</button>
+    <div id="simple-search-help-text"></div>
+</form>
+<hr>
+<div class="plan">Hieronder komen de resultaten. Aanvankelijk staat hier niets. Elk resultaat staat in een aanklikbare box die eventueel kan worden weggeklikt.</div>
 <div id="searchresults"></div>
-<div>Hier wordt een aangeklikt recept gedetailleerd weergegeven. Aanvankelijk staat hier niets.</div>
+<div class="plan">Hieronder wordt een aangeklikt recept gedetailleerd weergegeven. Aanvankelijk staat hier niets.</div>
 <div id="selectedresult"></div>
 
 <script src="/simplesearch.0641b553.js" defer=""></script>

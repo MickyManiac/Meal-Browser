@@ -8,7 +8,7 @@ Met deze API kan een grote hoeveelheid recepten worden doorzocht die op diverse 
 
 Met de functionaliteit "eenvoudig zoeken" helpt Meal Browser de gebruiker om recepten te vinden op basis van een
 zoekterm. Dit komt van pas om te zoeken naar een specifiek recept waarvan de naam grotendeels bekend is (zoals bij
-zoekterm "goat cheese salad") of naar een categorie van recepten (zoals bij zoekterm "fruit salad").  
+zoekterm "chicken salad sandwich") of naar een categorie van recepten (zoals bij zoekterm "fruit salad").  
 
 Met de functionaliteit "uitgebreid zoeken" kan de gebruiker een aantal zoekcriteria gebruiken om te zoeken naar
 recepten met de gewenste eigenschappen. Zo kan bijvoorbeeld worden gezocht naar een vegetarische pizza die binnen 60
