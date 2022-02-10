@@ -11,7 +11,7 @@ const selectedResultElement = document.getElementById(`selectedresult`);
 // Verwerk de zoekopdracht.
 async function handleTextQuery(evt) {
     // alert(`function handleTextQuery() is being called!`);
-    // Voorkom dat de pagina na een submit meteen ververst en alle geinjecteerde resulaten verdwijnen:
+    // Voorkom dat de pagina na een submit meteen ververst en alle geinjecteerde resulaten verdwijnen.
     evt.preventDefault();
     // Verwijder eventuele overblijfselen van een vorige zoekopdracht.
     helpTextElement.innerHTML = ``;
@@ -19,7 +19,7 @@ async function handleTextQuery(evt) {
     selectedResultElement.innerHTML = ``;
     // Neem het tekstveld element.
     const textFieldElement = document.getElementById(`text-query-field`);
-    if (validateText(textFieldElement.value)) {
+    if (validTextQuery(textFieldElement.value)) {
         // Geef de ingevulde zoekterm aan de functie die de zoekopdracht uitvoert.
         await fetchData(textFieldElement.value);
     }
@@ -27,16 +27,16 @@ async function handleTextQuery(evt) {
     textFieldElement.value = ``;
 }
 
-// Controleer of "text" een gelige zoekterm is en geef indien nodig gepast foutmeldingen.
-function validateText(text) {
+// Controleer of "text" een geldige zoekterm is en geef indien nodig gepaste foutmeldingen.
+function validTextQuery(text) {
     let returnValue = false;
     if (!text)  {
         // Geen zoekterm ingevuld.
         helpTextElement.innerHTML = `Vul een zoekterm in.`;
         resultsElement.innerHTML = ``;
-    } else if (!alphaNumeric(text))  {
+    } else if (!validCharacters(text))  {
         // Geen geldige zoekterm ingevuld
-        helpTextElement.innerHTML = `Geen geldige zoekterm. Vul alleen letter of cijfers in.`;
+        helpTextElement.innerHTML = `${text} is geen geldige zoekterm. Toegestaan zijn alle letters, de tekens <span class="symbols">" & ( ) + -</span> en spaties.`;
         resultsElement.innerHTML = ``;
     } else {
         returnValue = true;
@@ -44,14 +44,28 @@ function validateText(text) {
     return returnValue;
 }
 
-// Controleer of de tekens van "str" zijn toegestaan.
-// To do: ook umlaut letters etc, ook verbindingsteken, spatie, geen ?&=<>/;, wel ,.-_
-function alphaNumeric(str) {
+// Controleer of de tekens van "str" zijn toegestaan in een zoekterm.
+// Zie https://en.wikipedia.org/wiki/List_of_Unicode_characters
+//   (32 <= code <= 48) => ASCII punctuation and symbols: <space>!"#$%&'()*+,-./
+//   (48 <= code <= 57) => ASCII digits: 0-9
+//   (58 <= code <= 64) => Latin punctuation and symbols: :;<=>?@
+//   (65 <= code <= 90) => Latin alphabet uppercase: (A-Z)
+//   (91 <= code <= 96) => Latin punctuation and symbols: [\]^_`
+//   (97 <= code <= 122) => Latin alphabet lowercase: (a-z)
+//   (123 <= code <= 126) => Latin punctuation and symbols: {|}~
+//   (192 <= code <= 214) => More uppercase letters, like latin capital letter N with tilde
+//   (216 <= code <= 222) => More uppercase letters, like latin capital Letter U with diaeresis
+//   (223 <= code <= 246) => More lowercase letters, like Latin small letter n with tilde
+//   (248 <= code <= 255) => More lowercase letters, like Latin small letter u with diaeresis
+// Toegestaan zijn karakters met een code in het bereik: 65 <= code <= 90, 97 <= code <= 122, 192 <= code <= 255
+// Dit zijn de hoofd- en kleine letters (ook vanaf niet-Nederlandse toetsenborden).
+// Toegestaan zijn ook de karakters <space>"&()+-
+function validCharacters(str) {
     for (let i = 0; i < str.length; i++) {
         let code = str.charCodeAt(i);
-        if (!(code > 47 && code < 58) && // numeric (0-9)
-            !(code > 64 && code < 91) && // upper alpha (A-Z)
-            !(code > 96 && code < 123)) { // lower alpha (a-z)
+        if (!( (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || (code >= 192 && code <= 255) ||
+            str.charAt(i) === ' ' || str.charAt(i) === '"' || str.charAt(i) === '&' || str.charAt(i) === '(' ||
+            str.charAt(i) === ')' || str.charAt(i) === '+' || str.charAt(i) === '-' )) {
             return false;
         }
     }
@@ -64,9 +78,9 @@ async function fetchData(searchString) {
     // Probeer externe data op te halen.
     try {
         // Doe een spoonacular request met searchString als zoekterm.
-        // Vraag voor nu om slechts 1 recept.
+        // Vraag voor nu om maximaal 2 recepten.
         // Ontvang de response in variabele response.
-        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=1&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
+        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=2&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // Toon het resultaat in de console.
         console.log(response);
         // Zet het hier benodigde deel van de response in variabele receivedResults.
@@ -83,15 +97,17 @@ async function fetchData(searchString) {
                 resultsElement.innerHTML = ``;
             } else {
                 // Injecteer de informatie uit het zoekresultaat als html.
-                resultsElement.innerHTML = `
-                   <hr>
-                   <div class="resultbox" onclick="fetchRecipe(${receivedResults[0].id})">
-                       <div>${receivedResults[0].id}</div>
-                       <div>${receivedResults[0].title}</div>
-                       <div><img  alt="${receivedResults[0].title}" src="${receivedResults[0].image}"></div>
-                   </div>
-                   <hr>
-                `;
+                resultsElement.innerHTML = `<hr>`;
+                for (let i=0; i<receivedResults.length; i++) {
+                    resultsElement.innerHTML += `
+                       <div class="resultbox" onclick="fetchRecipe(${receivedResults[i].id})">
+                        <div>${receivedResults[i].id}</div>
+                        <div>${receivedResults[i].title}</div>
+                        <div><img alt="${receivedResults[i].title}" src="${receivedResults[i].image}"></div>
+                       </div>
+                    `;
+                }
+                resultsElement.innerHTML += `<hr>`;
             }
         }
     } catch(err) {
