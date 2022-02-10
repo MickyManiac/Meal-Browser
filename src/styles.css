@@ -1,3 +1,8 @@
+body {
+    width: 90%;
+    margin: auto;
+}
+
 div.plan {
     padding: 5px;
     color: darkseagreen;
@@ -5,8 +10,9 @@ div.plan {
 }
 
 h1 {
-    font-family: cursive;
     background-color: slategrey;
+    text-align: center;
+    font-family: cursive;
 }
 
 #simple-search-help-text {
@@ -15,18 +21,72 @@ h1 {
     font-weight: bold;
 }
 
+span.symbols {
+    font-family: monospace;
+}
+
+span.quoted {
+    font-style: italic;
+}
+
+/************************************************************************************************/
+
+div#searchresults {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-items: stretch;
+    border: 1px dashed black;
+}
+
+div.arrow {
+    border: 1px dashed black;
+    align-self: center;
+    width: 5%;
+    text-align: center;
+    font-size: 400%;
+    font-family: cursive;
+    color: grey;
+}
+
+div.arrow:hover {
+    cursor: pointer;
+    font-weight: bold;
+}
+
 div.resultbox {
+    margin: auto 5px auto 5px;
     border: 1px solid black;
     padding: 5px;
+    width: 27%;
 }
 
 div.resultbox:hover {
     cursor: pointer;
-    border: 4px solid red;
-    padding: 5px;
+    border: 2px solid black;
     font-weight: bold;
 }
 
-span.symbols {
-    font-family: monospace;
+div.recipename {
+    height: 40px;
 }
+
+div.preparationtime {
+    display: box;
+    padding: 10px 0px 0px 0px;
+}
+
+div.imagebox {
+    display: flex;
+    max-height: 200px;
+    overflow: hidden;
+}
+
+img.icon {
+    display: block;
+    margin: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+/************************************************************************************************/

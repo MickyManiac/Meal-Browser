@@ -36,7 +36,7 @@ function validTextQuery(text) {
         resultsElement.innerHTML = ``;
     } else if (!validCharacters(text))  {
         // Geen geldige zoekterm ingevuld
-        helpTextElement.innerHTML = `${text} is geen geldige zoekterm. Toegestaan zijn alle letters, de tekens <span class="symbols">" & ( ) + -</span> en spaties.`;
+        helpTextElement.innerHTML = `<span class="quoted">${text}</span> is geen geldige zoekterm. Toegestaan zijn: alle letters, de tekens <span class="symbols">" & ( ) + -</span> en spaties.`;
         resultsElement.innerHTML = ``;
     } else {
         returnValue = true;
@@ -72,7 +72,7 @@ function validCharacters(str) {
     return true;
 }
 
-// Probeer externe data op te halen die ovreenkomen met de zoekopdracht.
+// Probeer externe data op te halen die overeenkomen met de zoekopdracht.
 async function fetchData(searchString) {
     // alert(`function call fetchData(${searchString}) !`);
     // Probeer externe data op te halen.
@@ -80,6 +80,7 @@ async function fetchData(searchString) {
         // Doe een spoonacular request met searchString als zoekterm.
         // Vraag voor nu om maximaal 2 recepten.
         // Ontvang de response in variabele response.
+        // const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=1&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=2&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // Toon het resultaat in de console.
         console.log(response);
@@ -97,17 +98,30 @@ async function fetchData(searchString) {
                 resultsElement.innerHTML = ``;
             } else {
                 // Injecteer de informatie uit het zoekresultaat als html.
-                resultsElement.innerHTML = `<hr>`;
-                for (let i=0; i<receivedResults.length; i++) {
+                // Er passen maximaal 3 resultaten in de galerij.
+                let gallerySize = 3;
+                if (receivedResults.length < 3) {
+                    gallerySize = receivedResults.length;
+                }
+                resultsElement.innerHTML = ``;
+//                    if (receivedResults.length > 3) {
+                resultsElement.innerHTML += `<div class="arrow">&lt;</div>`;
+//                    }
+                for (let i=0; i<gallerySize; i++) {
                     resultsElement.innerHTML += `
                        <div class="resultbox" onclick="fetchRecipe(${receivedResults[i].id})">
                         <div>${receivedResults[i].id}</div>
-                        <div>${receivedResults[i].title}</div>
-                        <div><img alt="${receivedResults[i].title}" src="${receivedResults[i].image}"></div>
+                        <div class="recipename">${receivedResults[i].title}</div>
+                        <div class="imagebox"><img class="icon" alt="${receivedResults[i].title}" src="${receivedResults[i].image}"></div>
+                        <div class="preparationtime">Bereidingstijd:</div>
                        </div>
-                    `;
+                      `;
                 }
-                resultsElement.innerHTML += `<hr>`;
+//                    if (receivedResults.length > 3) {
+                resultsElement.innerHTML += `
+                       <div class="arrow">&gt;</div>
+                      `;
+//                    }
             }
         }
     } catch(err) {
