@@ -36,7 +36,7 @@ function validTextQuery(text) {
         resultsElement.innerHTML = ``;
     } else if (!validCharacters(text))  {
         // Geen geldige zoekterm ingevuld
-        helpTextElement.innerHTML = `<span class="quoted">${text}</span> is geen geldige zoekterm. Toegestaan zijn: alle letters, de tekens <span class="symbols">" & ( ) + -</span> en spaties.`;
+        helpTextElement.innerHTML = `<span class="quoted">${text}</span> is geen geldige zoekterm. Toegestaan zijn: alle letters, de tekens <span class="symbol">"</span> <span class="symbol">&</span> <span class="symbol">(</span> <span class="symbol">)</span> <span class="symbol">+</span> <span class="symbol">-</span> en spaties.`;
         resultsElement.innerHTML = ``;
     } else {
         returnValue = true;
@@ -44,7 +44,7 @@ function validTextQuery(text) {
     return returnValue;
 }
 
-// Controleer of de tekens van "str" zijn toegestaan in een zoekterm.
+// Controleer of de tekens van "text" zijn toegestaan in een zoekterm.
 // Zie https://en.wikipedia.org/wiki/List_of_Unicode_characters
 //   (32 <= code <= 48) => ASCII punctuation and symbols: <space>!"#$%&'()*+,-./
 //   (48 <= code <= 57) => ASCII digits: 0-9
@@ -60,12 +60,12 @@ function validTextQuery(text) {
 // Toegestaan zijn karakters met een code in het bereik: 65 <= code <= 90, 97 <= code <= 122, 192 <= code <= 255
 // Dit zijn de hoofd- en kleine letters (ook vanaf niet-Nederlandse toetsenborden).
 // Toegestaan zijn ook de karakters <space>"&()+-
-function validCharacters(str) {
-    for (let i = 0; i < str.length; i++) {
-        let code = str.charCodeAt(i);
+function validCharacters(text) {
+    for (let i = 0; i < text.length; i++) {
+        let code = text.charCodeAt(i);
         if (!( (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || (code >= 192 && code <= 255) ||
-            str.charAt(i) === ' ' || str.charAt(i) === '"' || str.charAt(i) === '&' || str.charAt(i) === '(' ||
-            str.charAt(i) === ')' || str.charAt(i) === '+' || str.charAt(i) === '-' )) {
+            text.charAt(i) === ' ' || text.charAt(i) === '"' || text.charAt(i) === '&' || text.charAt(i) === '(' ||
+            text.charAt(i) === ')' || text.charAt(i) === '+' || text.charAt(i) === '-' )) {
             return false;
         }
     }
@@ -109,6 +109,59 @@ async function fetchData(searchString) {
     }
 }
 
+// Hou bij welk resultaat op de eerste positie in de resultatengalerij staat.
+let offset = 0;
+
+// Schuif alle items een positie door, naar rechts
+window.clickLeft = function() {
+    offset -= 1;
+    if (offset === -1) {
+        offset = receivedResults.length-1;
+    }
+    showResults(offset);
+}
+
+// Schuif alle items een positie door, naar links
+window.clickRight = function() {
+    offset += 1;
+    if (offset === receivedResults.length) {
+        offset = 0;
+    }
+    showResults(offset);
+}
+
+// Toon de resultaten in een galerij met een bepaalde offset
+function showResults(offset) {
+    // Er passen maximaal 3 resultaten in de galerij.
+    const gallerySize = 3;
+    let nrItemsInGallery = gallerySize;
+    if (receivedResults.length < gallerySize) {
+        nrItemsInGallery = receivedResults.length;
+    }
+    resultsElement.innerHTML = ``;
+    if (receivedResults.length > gallerySize) {
+        resultsElement.innerHTML += `<div class="arrow" onclick="clickLeft()" onSelectStart="return false;">&lt;</div>`;
+    }
+    for (let i=0; i<nrItemsInGallery; i++) {
+        // Bepaal welk resultaat op deze positie in de galerij moet staan.
+        let resultIndex = i+offset;
+        if (resultIndex >= receivedResults.length) {
+            resultIndex -= receivedResults.length;
+        }
+        resultsElement.innerHTML += `
+                       <div class="resultbox" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
+                        <div>${receivedResults[resultIndex].id}</div>
+                        <div class="recipename">${receivedResults[resultIndex].title}</div>
+                        <div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>
+                        <div class="preparationtime">Bereidingstijd:</div>
+                       </div>
+                      `;
+    }
+    if (receivedResults.length > gallerySize) {
+        resultsElement.innerHTML += `<div class="arrow" onclick="clickRight()" onSelectStart="return false;">&gt;</div>`;
+    }
+}
+
 // Haal meer informatie op voor een specifiek recept
 // Gebruik een vanwege parcel benodigde "workaround" om vanuit html met onclick deze functie te vinden.
 //  Zie https://github.com/parcel-bundler/parcel/issues/3755
@@ -127,7 +180,20 @@ window.fetchRecipe = async function(recipeId) {
             selectedResultElement.innerHTML = `Geen verdere  informmatie gevonden voor dit recept.`;
         } else if (receivedResult.sourceUrl) {
             // Injecteer de informatie uit het zoekresultaat als html.
+            let ingredients = `Geen ingredi&euml;nten gevonden voor dit recept.`;
+            if (receivedResult.extendedIngredients && receivedResult.extendedIngredients.length > 0) {
+                ingredients = `<ul>`;
+                for (let i=0; i<receivedResult.extendedIngredients.length; i++) {
+                    ingredients += `<li>${receivedResult.extendedIngredients[i].original}</li>`;
+                }
+                ingredients += `</ul>`;
+            }
             selectedResultElement.innerHTML = `
+                <div>${receivedResult.title}</div>
+                <div><img alt="${receivedResult.title}" src="${receivedResult.image}"></div>
+                <div>Bereidingstijd: ${receivedResult.readyInMinutes} minuten</div>
+                <div>Ingredi&euml;nten:</div><div>${ingredients}</div>
+                <div>Bereidingswijze:</div><div>${receivedResult.instructions}</div>
                 <a href="${receivedResult.sourceUrl}" target=”_blank”>${receivedResult.sourceUrl}</a>
                 <hr>
             `;
@@ -137,55 +203,4 @@ window.fetchRecipe = async function(recipeId) {
     } catch(err) {
         console.error(err);
     }
-}
-
-// Hou bij welk resultaat op de eerste positie in de resultatengalerij staat.
-let offset = 0;
-
-// Schuif de items een positie naar rechts
-window.clickLeft = function() {
-    offset -= 1;
-    if (offset === -1) {
-        offset = receivedResults.length-1;
-    }
-    showResults(offset);
-}
-
-// Schuif de items een positie naar links
-window.clickRight = function() {
-    offset += 1;
-    if (offset === receivedResults.length) {
-        offset = 0;
-    }
-    showResults(offset);
-}
-
-// Show results in the galery with a certain offset
-function showResults(offset) {
-    // Er passen maximaal 3 resultaten in de galerij.
-    let gallerySize = 3;
-    if (receivedResults.length < 3) {
-        gallerySize = receivedResults.length;
-    }
-    resultsElement.innerHTML = ``;
-//                    if (receivedResults.length > 3) {
-    resultsElement.innerHTML += `<div class="arrow" onclick="clickLeft()">&lt;</div>`;
-//                    }
-    for (let i=0; i<gallerySize; i++) {
-        let resultIndex = i+offset;
-        if (resultIndex >= receivedResults.length) {
-            resultIndex -= receivedResults.length;
-        }
-        resultsElement.innerHTML += `
-                       <div class="resultbox" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
-                        <div>${receivedResults[resultIndex].id}</div>
-                        <div class="recipename">${receivedResults[resultIndex].title}</div>
-                        <div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>
-                        <div class="preparationtime">Bereidingstijd:</div>
-                       </div>
-                      `;
-    }
-//                    if (receivedResults.length > 3) {
-    resultsElement.innerHTML += `<div class="arrow" onclick="clickRight()">&gt;</div>`;
-//                    }
 }
