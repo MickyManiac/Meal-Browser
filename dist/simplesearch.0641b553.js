@@ -581,6 +581,8 @@ function validCharacters(str) {
     }
     return true;
 }
+// Het array waarin de resultaten zullen worden gezet
+let receivedResults = null;
 // Probeer externe data op te halen die overeenkomen met de zoekopdracht.
 async function fetchData(searchString) {
     // alert(`function call fetchData(${searchString}) !`);
@@ -590,11 +592,11 @@ async function fetchData(searchString) {
         // Vraag voor nu om maximaal 2 recepten.
         // Ontvang de response in variabele response.
         // const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=1&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
-        const response = await _axiosDefault.default.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=2&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
+        const response = await _axiosDefault.default.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // Toon het resultaat in de console.
         console.log(response);
         // Zet het hier benodigde deel van de response in variabele receivedResults.
-        const receivedResults = response.data.results;
+        receivedResults = response.data.results;
         // Controleer of er bruikbare resultaten zijn ontvangen
         if (!receivedResults) {
             // Geen resultaten ontvangen
@@ -604,29 +606,8 @@ async function fetchData(searchString) {
             // Geen resultaten ontvangen
             helpTextElement.innerHTML = `Geen resultaten voor zoekterm ${searchString}.`;
             resultsElement.innerHTML = ``;
-        } else {
-            // Injecteer de informatie uit het zoekresultaat als html.
-            // Er passen maximaal 3 resultaten in de galerij.
-            let gallerySize = 3;
-            if (receivedResults.length < 3) gallerySize = receivedResults.length;
-            resultsElement.innerHTML = ``;
-            //                    if (receivedResults.length > 3) {
-            resultsElement.innerHTML += `<div class="arrow">&lt;</div>`;
-            //                    }
-            for(let i = 0; i < gallerySize; i++)resultsElement.innerHTML += `
-                       <div class="resultbox" onclick="fetchRecipe(${receivedResults[i].id})">
-                        <div>${receivedResults[i].id}</div>
-                        <div class="recipename">${receivedResults[i].title}</div>
-                        <div class="imagebox"><img class="icon" alt="${receivedResults[i].title}" src="${receivedResults[i].image}"></div>
-                        <div class="preparationtime">Bereidingstijd:</div>
-                       </div>
-                      `;
-            //                    if (receivedResults.length > 3) {
-            resultsElement.innerHTML += `
-                       <div class="arrow">&gt;</div>
-                      `;
-        //                    }
-        }
+        } else // Injecteer de informatie uit het zoekresultaat als html.
+        showResults(0);
     } catch (err) {
         console.error(err);
     }
@@ -656,6 +637,45 @@ window.fetchRecipe = async function(recipeId) {
         console.error(err);
     }
 };
+// Hou bij welk resultaat op de eerste positie in de resultatengalerij staat.
+let offset = 0;
+// Schuif de items een positie naar rechts
+window.clickLeft = function() {
+    offset -= 1;
+    if (offset === -1) offset = receivedResults.length - 1;
+    showResults(offset);
+};
+// Schuif de items een positie naar links
+window.clickRight = function() {
+    offset += 1;
+    if (offset === receivedResults.length) offset = 0;
+    showResults(offset);
+};
+// Show results in the galery with a certain offset
+function showResults(offset1) {
+    // Er passen maximaal 3 resultaten in de galerij.
+    let gallerySize = 3;
+    if (receivedResults.length < 3) gallerySize = receivedResults.length;
+    resultsElement.innerHTML = ``;
+    //                    if (receivedResults.length > 3) {
+    resultsElement.innerHTML += `<div class="arrow" onclick="clickLeft()">&lt;</div>`;
+    //                    }
+    for(let i = 0; i < gallerySize; i++){
+        let resultIndex = i + offset1;
+        if (resultIndex >= receivedResults.length) resultIndex -= receivedResults.length;
+        resultsElement.innerHTML += `
+                       <div class="resultbox" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
+                        <div>${receivedResults[resultIndex].id}</div>
+                        <div class="recipename">${receivedResults[resultIndex].title}</div>
+                        <div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>
+                        <div class="preparationtime">Bereidingstijd:</div>
+                       </div>
+                      `;
+    }
+    //                    if (receivedResults.length > 3) {
+    resultsElement.innerHTML += `<div class="arrow" onclick="clickRight()">&gt;</div>`;
+//                    }
+}
 
 },{"axios":"jo6P5","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jo6P5":[function(require,module,exports) {
 module.exports = require('./lib/axios');
