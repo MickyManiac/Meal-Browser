@@ -92,3 +92,21 @@ img.icon {
 }
 
 /************************************************************************************************/
+
+div.recipetitle {
+    margin: 5px 0px 0px 0px;
+    font-weight: bold;
+    font-size: 140%;
+}
+
+div.recipesection {
+    margin: 5px 0px 0px 0px;
+    font-weight: bold;
+}
+
+img.recipeimage {
+    display: block;
+    margin: 5px;
+    max-width: 50%;
+    max-height: 50%;
+}

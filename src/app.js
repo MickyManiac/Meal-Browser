@@ -15,7 +15,7 @@ async function handleTextQuery(evt) {
     evt.preventDefault();
     // Verwijder eventuele overblijfselen van een vorige zoekopdracht.
     helpTextElement.innerHTML = ``;
-    resultsElement.innerHTML = `Zoekopdracht wordt uitgevoerd...`;
+    resultsElement.innerHTML = ``;
     selectedResultElement.innerHTML = ``;
     // Neem het tekstveld element.
     const textFieldElement = document.getElementById(`text-query-field`);
@@ -33,11 +33,9 @@ function validTextQuery(text) {
     if (!text)  {
         // Geen zoekterm ingevuld.
         helpTextElement.innerHTML = `Vul een zoekterm in.`;
-        resultsElement.innerHTML = ``;
     } else if (!validCharacters(text))  {
         // Geen geldige zoekterm ingevuld
         helpTextElement.innerHTML = `<span class="quoted">${text}</span> is geen geldige zoekterm. Toegestaan zijn: alle letters, de tekens <span class="symbol">"</span> <span class="symbol">&</span> <span class="symbol">(</span> <span class="symbol">)</span> <span class="symbol">+</span> <span class="symbol">-</span> en spaties.`;
-        resultsElement.innerHTML = ``;
     } else {
         returnValue = true;
     }
@@ -78,13 +76,15 @@ let receivedResults = null;
 // Probeer externe data op te halen die overeenkomen met de zoekopdracht.
 async function fetchData(searchString) {
     // alert(`function call fetchData(${searchString}) !`);
+    // Geef gebruikersfeedback.
+    resultsElement.innerHTML = `Zoekopdracht wordt uitgevoerd...`;
     // Probeer externe data op te halen.
     try {
         // Doe een spoonacular request met searchString als zoekterm.
         // Vraag voor nu om maximaal 2 recepten.
         // Ontvang de response in variabele response.
-        // const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=1&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
-        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
+        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=7&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
+        // const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // Toon het resultaat in de console.
         console.log(response);
         // Zet het hier benodigde deel van de response in variabele receivedResults.
@@ -138,10 +138,13 @@ function showResults(offset) {
     if (receivedResults.length < gallerySize) {
         nrItemsInGallery = receivedResults.length;
     }
+    // Bouw het html-fragment op.
     resultsElement.innerHTML = ``;
+    // Pijl om door de resultaten te klikken.
     if (receivedResults.length > gallerySize) {
         resultsElement.innerHTML += `<div class="arrow" onclick="clickLeft()" onSelectStart="return false;">&lt;</div>`;
     }
+    // Toon maximaal 3 resultaten in de galerij.
     for (let i=0; i<nrItemsInGallery; i++) {
         // Bepaal welk resultaat op deze positie in de galerij moet staan.
         let resultIndex = i+offset;
@@ -153,10 +156,11 @@ function showResults(offset) {
                         <div>${receivedResults[resultIndex].id}</div>
                         <div class="recipename">${receivedResults[resultIndex].title}</div>
                         <div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>
-                        <div class="preparationtime">Bereidingstijd:</div>
+                        <div class="preparationtime">Bereidingstijd: ${receivedResults[resultIndex].readyInMinutes} minuten</div>
                        </div>
                       `;
     }
+    // Pijl om door de resultaten te klikken.
     if (receivedResults.length > gallerySize) {
         resultsElement.innerHTML += `<div class="arrow" onclick="clickRight()" onSelectStart="return false;">&gt;</div>`;
     }
@@ -167,6 +171,8 @@ function showResults(offset) {
 //  Zie https://github.com/parcel-bundler/parcel/issues/3755
 window.fetchRecipe = async function(recipeId) {
     // alert(`function call fetchRecipe(${recipeId}) !`);
+    // Geef gebruikersfeedback.
+    selectedResultElement.innerHTML = `Gegevens worden opgehaald.`;
     try {
         // Ontvang de response in variabele response.
         const response = await axios.get(`https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=ada1ef8535a14d7695ff0ba52516335a`);
@@ -177,28 +183,72 @@ window.fetchRecipe = async function(recipeId) {
         // Controleer of er een bruikbaar resultaat is ontvangen.
         if (!receivedResult) {
             // Geen resultaat ontvangen
-            selectedResultElement.innerHTML = `Geen verdere  informmatie gevonden voor dit recept.`;
-        } else if (receivedResult.sourceUrl) {
-            // Injecteer de informatie uit het zoekresultaat als html.
-            let ingredients = `Geen ingredi&euml;nten gevonden voor dit recept.`;
-            if (receivedResult.extendedIngredients && receivedResult.extendedIngredients.length > 0) {
-                ingredients = `<ul>`;
-                for (let i=0; i<receivedResult.extendedIngredients.length; i++) {
-                    ingredients += `<li>${receivedResult.extendedIngredients[i].original}</li>`;
-                }
-                ingredients += `</ul>`;
+            selectedResultElement.innerHTML = `Geen verdere informatie gevonden voor dit recept.`;
+        } else {
+            // Verwerk de informatie uit het zoekresultaat in html fragmenten.
+            let titleSection = `<div class="recipetitle">Geen receptnaam gevonden.</div>`;
+            if (receivedResult.title) {
+                titleSection = `<div class="recipetitle">${receivedResult.title}</div>`;
             }
+            // Afbeelding
+            let imageSection = ``;
+            if (receivedResult.image) {
+                if (receivedResult.title) {
+                    imageSection = `<div class="recipesection"><img class="recipeimage" alt="${receivedResult.title}" src="${receivedResult.image}"></div>`;
+                } else {
+                    imageSection = `<div class="recipesection"><img class="recipeimage" alt="" src="${receivedResult.image}"></div>`;
+                }
+            }
+            // Bereidingstijd
+            let readyTimeSection = `<div class="recipesection">Geen bereidingstijd gevonden voor dit recept.</div>`;
+            if (receivedResult.readyInMinutes) {
+                readyTimeSection = `<div class="recipesection">Bereidingstijd</div><div>${receivedResult.readyInMinutes} minuten</div>`;
+            }
+            // Aantal personen
+            let nrServings = receivedResult.servings;
+            // Ingredienten
+            let ingredientsSection = `<div class="recipesection">Geen ingredi&euml;nten gevonden voor dit recept.</div>`;
+            if (receivedResult.extendedIngredients && receivedResult.extendedIngredients.length > 0) {
+                if (nrServings) {
+                    if (nrServings === 1) {
+                        ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor 1 persoon</div><div>`;
+                    }
+                    if (nrServings > 1) {
+                        ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor ${nrServings} personen</div><div>`;
+                    }
+                }
+                else {
+                    ingredientsSection = `<div class="recipesection">Ingredi&euml;nten</div><div>`;
+                }
+                for (let i=0; i<receivedResult.extendedIngredients.length; i++) {
+                    ingredientsSection += `${receivedResult.extendedIngredients[i].original}<br>`;
+                }
+                ingredientsSection += `</div>`;
+            } else if (receivedResult.sourceUrl) {
+                ingredientsSection = `<div class="recipesection">Bekijk de ingredi&euml;nten voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
+            }
+            // Bereidingswijze
+            let instructionsSection = `<div class="recipesection">Geen bereidingswijze gevonden voor dit recept.</div>`;
+            if (receivedResult.instructions) {
+                instructionsSection = `<div class="recipesection">Bereidingswijze</div><div>${receivedResult.instructions}</div>`;
+            } else if (receivedResult.sourceUrl) {
+                instructionsSection = `<div class="recipesection">Bekijk de bereidingswijze voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
+            }
+            // Externe link
+            let sourceUrlSection = `<div class="recipesection">Geen externe link gevonden voor dit recept.</div>`;
+            if (receivedResult.sourceUrl) {
+                sourceUrlSection = `<div class="recipesection">Bron</div><div><a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a></div>`;
+            }
+            // Injecteer de informatie uit het zoekresultaat als html.
             selectedResultElement.innerHTML = `
-                <div>${receivedResult.title}</div>
-                <div><img alt="${receivedResult.title}" src="${receivedResult.image}"></div>
-                <div>Bereidingstijd: ${receivedResult.readyInMinutes} minuten</div>
-                <div>Ingredi&euml;nten:</div><div>${ingredients}</div>
-                <div>Bereidingswijze:</div><div>${receivedResult.instructions}</div>
-                <a href="${receivedResult.sourceUrl}" target=”_blank”>${receivedResult.sourceUrl}</a>
+                ${titleSection}
+                ${imageSection}
+                ${readyTimeSection}
+                ${ingredientsSection}
+                ${instructionsSection}
+                ${sourceUrlSection}
                 <hr>
             `;
-        } else {
-            selectedResultElement.innerHTML = `Geen externe link gevonden voor dit recept.`;
         }
     } catch(err) {
         console.error(err);
