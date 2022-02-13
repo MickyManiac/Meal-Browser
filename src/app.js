@@ -6,6 +6,7 @@ document.getElementById(`simple-search-form`).addEventListener("submit", handleT
 // Neem de elementen waarin html fragmenten geinjecteerd gaan worden.
 const helpTextElement = document.getElementById(`simple-search-help-text`);
 const resultsElement = document.getElementById(`searchresults`);
+let galleryElement = null;
 const selectedResultElement = document.getElementById(`selectedresult`);
 
 // Verwerk de zoekopdracht.
@@ -81,9 +82,8 @@ async function fetchData(searchString) {
     // Probeer externe data op te halen.
     try {
         // Doe een spoonacular request met searchString als zoekterm.
-        // Vraag voor nu om maximaal 2 recepten.
         // Ontvang de response in variabele response.
-        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=7&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
+        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // Toon het resultaat in de console.
         console.log(response);
@@ -100,6 +100,12 @@ async function fetchData(searchString) {
                 helpTextElement.innerHTML = `Geen resultaten voor zoekterm ${searchString}.`;
                 resultsElement.innerHTML = ``;
             } else {
+                resultsElement.innerHTML = `
+                    Resultaten voor zoekterm ${searchString}
+                    <div id="gallery">Galerij</div>
+                `;
+                galleryElement = document.getElementById(`gallery`);
+
                 // Injecteer de informatie uit het zoekresultaat als html.
                 showResults(0);
             }
@@ -139,10 +145,10 @@ function showResults(offset) {
         nrItemsInGallery = receivedResults.length;
     }
     // Bouw het html-fragment op.
-    resultsElement.innerHTML = ``;
+    galleryElement.innerHTML = ``;
     // Pijl om door de resultaten te klikken.
     if (receivedResults.length > gallerySize) {
-        resultsElement.innerHTML += `<div class="arrow" onclick="clickLeft()" onSelectStart="return false;">&lt;</div>`;
+        galleryElement.innerHTML += `<div class="arrow" onclick="clickLeft()" onSelectStart="return false;">&lt;</div>`;
     }
     // Toon maximaal 3 resultaten in de galerij.
     for (let i=0; i<nrItemsInGallery; i++) {
@@ -151,19 +157,46 @@ function showResults(offset) {
         if (resultIndex >= receivedResults.length) {
             resultIndex -= receivedResults.length;
         }
-        resultsElement.innerHTML += `
+        // Verwerk de informatie uit het zoekresultaat in html fragmenten.
+        // Receptnummer
+        let idLine = `<div>---</div>`;
+        if (receivedResults[resultIndex].id) {
+            idLine = `<div>${receivedResults[resultIndex].id}</div>`;
+        }
+        // Receptnaam
+        let titleLine = `<div class="recipename">Receptnaam niet gevonden.</div>`;
+        if (receivedResults[resultIndex].title) {
+            titleLine = `<div class="recipename">${receivedResults[resultIndex].title}</div>`;
+        }
+        // Afbeelding
+        let imageLine = `<div class="imagebox"><img class="icon" alt="No food picture found." src="../images/NoImageFound.gif"></div>`;;
+        if (receivedResults[resultIndex].image) {
+            if (receivedResults[resultIndex].title) {
+                imageLine = `<div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>`;
+            } else {
+                imageLine = `<div class="imagebox"><img class="icon" alt="" src="${receivedResults[resultIndex].image}"></div>`;
+            }
+        }
+        // Bereidingstijd
+        let readyTimeLine = `<div class="preparationtime">Bereidingstijd niet gevonden.</div>`;
+        if (receivedResults[resultIndex].readyInMinutes) {
+            readyTimeLine = `<div class="preparationtime">Bereidingstijd: ${receivedResults[resultIndex].readyInMinutes} minuten</div>`;
+        }
+        // Injecteer de informatie uit het zoekresultaat als html.
+        galleryElement.innerHTML += `
                        <div class="resultbox" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
-                        <div>${receivedResults[resultIndex].id}</div>
-                        <div class="recipename">${receivedResults[resultIndex].title}</div>
-                        <div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>
-                        <div class="preparationtime">Bereidingstijd: ${receivedResults[resultIndex].readyInMinutes} minuten</div>
+                        ${idLine}
+                        ${titleLine}
+                        ${imageLine}
+                        ${readyTimeLine}
                        </div>
                       `;
     }
     // Pijl om door de resultaten te klikken.
     if (receivedResults.length > gallerySize) {
-        resultsElement.innerHTML += `<div class="arrow" onclick="clickRight()" onSelectStart="return false;">&gt;</div>`;
+        galleryElement.innerHTML += `<div class="arrow" onclick="clickRight()" onSelectStart="return false;">&gt;</div>`;
     }
+    selectedResultElement.innerHTML = `<hr>`;
 }
 
 // Haal meer informatie op voor een specifiek recept
@@ -172,7 +205,7 @@ function showResults(offset) {
 window.fetchRecipe = async function(recipeId) {
     // alert(`function call fetchRecipe(${recipeId}) !`);
     // Geef gebruikersfeedback.
-    selectedResultElement.innerHTML = `Gegevens worden opgehaald.`;
+    selectedResultElement.innerHTML = `<hr>Gegevens worden opgehaald.`;
     try {
         // Ontvang de response in variabele response.
         const response = await axios.get(`https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=ada1ef8535a14d7695ff0ba52516335a`);
@@ -183,7 +216,7 @@ window.fetchRecipe = async function(recipeId) {
         // Controleer of er een bruikbaar resultaat is ontvangen.
         if (!receivedResult) {
             // Geen resultaat ontvangen
-            selectedResultElement.innerHTML = `Geen verdere informatie gevonden voor dit recept.`;
+            selectedResultElement.innerHTML = `<hr>Geen verdere informatie gevonden voor dit recept.`;
         } else {
             // Verwerk de informatie uit het zoekresultaat in html fragmenten.
             let titleSection = `<div class="recipetitle">Geen receptnaam gevonden.</div>`;
@@ -204,17 +237,17 @@ window.fetchRecipe = async function(recipeId) {
             if (receivedResult.readyInMinutes) {
                 readyTimeSection = `<div class="recipesection">Bereidingstijd</div><div>${receivedResult.readyInMinutes} minuten</div>`;
             }
-            // Aantal personen
+            // Aantal porties
             let nrServings = receivedResult.servings;
             // Ingredienten
             let ingredientsSection = `<div class="recipesection">Geen ingredi&euml;nten gevonden voor dit recept.</div>`;
             if (receivedResult.extendedIngredients && receivedResult.extendedIngredients.length > 0) {
                 if (nrServings) {
                     if (nrServings === 1) {
-                        ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor 1 persoon</div><div>`;
+                        ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor 1 portie</div><div>`;
                     }
                     if (nrServings > 1) {
-                        ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor ${nrServings} personen</div><div>`;
+                        ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor ${nrServings} porties</div><div>`;
                     }
                 }
                 else {
@@ -241,6 +274,7 @@ window.fetchRecipe = async function(recipeId) {
             }
             // Injecteer de informatie uit het zoekresultaat als html.
             selectedResultElement.innerHTML = `
+                <hr>
                 ${titleSection}
                 ${imageSection}
                 ${readyTimeSection}
@@ -250,6 +284,7 @@ window.fetchRecipe = async function(recipeId) {
                 <hr>
             `;
         }
+        selectedResultElement.innerHTML += `<hr>`;
     } catch(err) {
         console.error(err);
     }

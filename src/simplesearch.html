@@ -6,6 +6,12 @@
     <title>Meal Browser | Simple Search</title>
 </head>
 <body>
+<nav class="navbar">
+  <a href="index.html">Meal Browser</a>
+  <a href="simplesearch.html" class="active">Eenvoudig zoeken</a>
+  <a href="advancedsearch.html">Uitgebreid zoeken</a>
+  <a href="mostpopular.html">Populaire recepten</a>
+</nav>
 <h1>Eenvoudig zoeken naar recepten</h1>
 <hr>
 <div>Vul een zoekterm in.</div>
@@ -15,9 +21,7 @@
     <div id="simple-search-help-text"></div>
 </form>
 <hr>
-<div class="plan">Hieronder komen de resultaten. Aanvankelijk staat hier niets. Elk resultaat staat in een aanklikbare box die eventueel kan worden weggeklikt.</div>
 <div id="searchresults"></div>
-<div class="plan">Hieronder wordt een aangeklikt recept gedetailleerd weergegeven. Aanvankelijk staat hier niets.</div>
 <div id="selectedresult"></div>
 
 <script type="module" src="app.js"></script>
