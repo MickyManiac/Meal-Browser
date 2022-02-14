@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="styles.css">
     <title>Meal Browser | Simple Search</title>
 </head>
-<body>
+<body onload="startSimpleSearch()">
 <nav class="navbar">
   <a href="index.html">Meal Browser</a>
   <a href="simplesearch.html" class="active">Eenvoudig zoeken</a>
@@ -14,12 +14,7 @@
 </nav>
 <h1>Eenvoudig zoeken naar recepten</h1>
 <hr>
-<div>Vul een zoekterm in.</div>
-<form id="simple-search-form">
-    <input type="text" name="text-query" id="text-query-field" placeholder="Jouw zoekterm">
-    <button  type="submit">Zoeken</button>
-    <div id="simple-search-help-text"></div>
-</form>
+<div id="searchform"></div>
 <hr>
 <div id="searchresults"></div>
 <div id="selectedresult"></div>

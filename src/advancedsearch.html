@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="styles.css">
     <title>Meal Browser | Advanced Search</title>
 </head>
-<body>
+<body onload="startAdvancedSearch()">
 <nav class="navbar">
   <a href="index.html">Meal Browser</a>
   <a href="simplesearch.html">Eenvoudig zoeken</a>
@@ -13,5 +13,12 @@
   <a href="mostpopular.html">Populaire recepten</a>
 </nav>
 <h1>Uitgebreid zoeken naar recepten</h1>
+<hr>
+<div id="searchform"></div>
+<hr>
+<div id="searchresults"></div>
+<div id="selectedresult"></div>
+
+<script type="module" src="app.js"></script>
 </body>
 </html>

@@ -1,32 +1,197 @@
 ﻿import axios from 'axios';
 
-// Plaats een submit event listener op het form element
-document.getElementById(`simple-search-form`).addEventListener("submit", handleTextQuery);
-
-// Neem de elementen waarin html fragmenten geinjecteerd gaan worden.
-const helpTextElement = document.getElementById(`simple-search-help-text`);
+// Gebruik globale variabelen voor de elementen waarin html fragmenten geinjecteerd gaan worden.
+let helpTextElement = null;
 const resultsElement = document.getElementById(`searchresults`);
 let galleryElement = null;
 const selectedResultElement = document.getElementById(`selectedresult`);
 
-// Verwerk de zoekopdracht.
-async function handleTextQuery(evt) {
-    // alert(`function handleTextQuery() is being called!`);
-    // Voorkom dat de pagina na een submit meteen ververst en alle geinjecteerde resulaten verdwijnen.
+// Injecteer het zoekformulier voor eenvoudig zoeken op aanvraag van de betreffende pagina.
+window.startSimpleSearch = function() {
+    document.getElementById(`searchform`).innerHTML = `
+    <form id="simple-search-form">
+        <fieldset>
+            <label for="text-query-field">Vul een zoekterm in:</label>
+            <input type="text" name="text-query" id="text-query-field" placeholder="bijv fruit salad">
+            <button  type="submit">Zoeken</button>
+        </fieldset>
+        <div id="form-help-text"></div>
+    </form>
+  `;
+
+    // Plaats een submit event listener op het form element
+    document.getElementById(`simple-search-form`).addEventListener("submit", handleSimpleFormSubmit);
+
+    // Ken aan globale variabele helpTextElement de bedoelde waarde toe.
+    helpTextElement = document.getElementById(`form-help-text`);
+}
+
+// Injecteer het zoekformulier voor uitgebreid zoeken op aanvraag van de betreffende pagina.
+window.startAdvancedSearch = function() {
+    document.getElementById(`searchform`).innerHTML = `
+    <form id="advanced-search-form">
+        <fieldset>
+            <legend>Gewenste eigenschappen</legend>
+            <label for="text-query-field">Vul een zoekterm in:</label>
+            <input type="text" id="text-query-field" name="text-query" placeholder="bijv fruit salad"><br><br>
+            <label for="preparation-time-field">Maximale bereidingstijd in minuten:</label>
+            <input type="text" id="preparation-time-field" name="preparation-time" placeholder="bijv 30"><br><br>
+                <label for="cuisine">Welke keuken?</label>
+                <select id="cuisine-selection" name="cuisine">
+                    <option value="No preference">No preference</option>
+                    <option value="African">African</option>
+                    <option value="American">American</option>
+                    <option value="British">British</option>
+                    <option value="Cajun">Cajun</option>
+                    <option value="Caribbean">Caribbean</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Eastern European">Eastern European</option>
+                    <option value="European">European</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Greek">Greek</option>
+                    <option value="Indian">Indian</option>
+                    <option value="Irish">Irish</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Jewish">Jewish</option>
+                    <option value="Korean">Korean</option>
+                    <option value="Latin American">Latin American</option>
+                    <option value="Mediterranean">Mediterranean</option>
+                    <option value="Mexican">Mexican</option>
+                    <option value="Middle Eastern">Middle Eastern</option>
+                    <option value="Nordic">Nordic</option>
+                    <option value="Southern">Southern</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="Thai">Thai</option>
+                    <option value="Vietnamese">Vietnamese</option>
+                </select><br><br>
+                <label for="diet">Dieet</label>
+                <select id="diet-selection" name="diet">
+                    <option value="None">None</option>
+                    <option value="Gluten free">Gluten free</option>
+                    <option value="Ketogenic">Ketogenic</option>
+                    <option value="Vegan">Vegan</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                </select><br><br>
+            <button  type="submit">Zoeken</button>
+            <button  type="reset">Reset</button>
+        </fieldset>
+        <div id="form-help-text"></div>
+    </form>
+  `;
+
+    // Plaats een submit event listener op het form element
+    document.getElementById(`advanced-search-form`).addEventListener("submit", handleAdvancedFormSubmit);
+
+    // Ken aan globale variabele helpTextElement de bedoelde waarde toe.
+    helpTextElement = document.getElementById(`form-help-text`);
+}
+
+// Verwerk de zoekopdracht voor eenvoudig zoeken.
+async function handleSimpleFormSubmit(evt) {
+    // alert(`function handleSimpleFormSubmit() is being called!`);
+    // Voorkom dat de pagina na een submit meteen ververst en alle geinjecteerde inhoud verdwijnt:
     evt.preventDefault();
     // Verwijder eventuele overblijfselen van een vorige zoekopdracht.
     helpTextElement.innerHTML = ``;
     resultsElement.innerHTML = ``;
     selectedResultElement.innerHTML = ``;
+
+    //NEW
+    let apiQueryString = `https://api.spoonacular.com/recipes/complexSearch?number=4&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`;
+    let searchSummary = ``;
+
+    // Valideer de waarde van het query tekstveld.
     // Neem het tekstveld element.
-    const textFieldElement = document.getElementById(`text-query-field`);
-    if (validTextQuery(textFieldElement.value)) {
-        // Geef de ingevulde zoekterm aan de functie die de zoekopdracht uitvoert.
-        await fetchData(textFieldElement.value);
+    const queryTextFieldElement = document.getElementById(`text-query-field`);
+    const textQueryValue = queryTextFieldElement.value;
+    if (validTextQuery(textQueryValue)) {
+        apiQueryString += `&query=${textQueryValue}`;
+        searchSummary += `zoekterm ${textQueryValue}`;
+        // Geef de query en de zoekopdracht aan de functie die de zoekopdracht uitvoert.
+        await fetchData(apiQueryString, searchSummary);
     }
+
     // Maak het tekstveld weer leeg.
-    textFieldElement.value = ``;
+    // queryTextFieldElement.value = ``;
 }
+
+// Verwerk de zoekopdracht voor uitgebreid zoeken.
+async function handleAdvancedFormSubmit(evt) {
+    // alert(`function handleFormSubmit() is being called!`);
+    // Voorkom dat de pagina na een submit meteen ververst en alle geinjecteerde inhoud verdwijnt:
+    evt.preventDefault();
+    // Verwijder eventuele overblijfselen van een vorige zoekopdracht.
+    helpTextElement.innerHTML = ``;
+    resultsElement.innerHTML = ``;
+    selectedResultElement.innerHTML = ``;
+
+    //NEW
+    let apiQueryString = `https://api.spoonacular.com/recipes/complexSearch?number=5&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`;
+    let searchSummary = ``;
+    let validInput = true;
+
+    // Valideer de waarde van het query tekstveld.
+    // Neem het tekstveld element.
+    const queryTextFieldElement = document.getElementById(`text-query-field`);
+    const textQueryValue = queryTextFieldElement.value;
+    if (validTextQuery(textQueryValue)) {
+        apiQueryString += `&query=${textQueryValue}`;
+        searchSummary += `zoekterm ${textQueryValue}`;
+    } else {
+        validInput = false;
+    }
+
+    // Valideer de waarde van het preparation-time tekstveld.
+    // Neem het tekstveld element.
+    const preparationTimeTextFieldElement = document.getElementById(`preparation-time-field`);
+    const preparationTimeValue = preparationTimeTextFieldElement.value;
+    if (isPositiveNumber(preparationTimeValue)) {
+        // isPositiveNumber is ook true voor een lege string, maar een lege string hoeft niet te worden ingevuld in de api query
+        if (preparationTimeValue) {
+            apiQueryString += `&maxReadyTime=${preparationTimeValue}`;
+            searchSummary += `, maximale bereidingstijd ${preparationTimeValue} minuten`;
+        }
+    } else {
+        // Ongeldige bereidingstijd ingevuld
+        if (helpTextElement.innerHTML) {
+            helpTextElement.innerHTML += `<br>`;
+        }
+        helpTextElement.innerHTML += `<span class="quoted">${preparationTimeValue}</span> is geen geldige bereidingstijd. Toegestaan zijn alleen cijfers.`;
+        validInput = false;
+    }
+
+    // Valideer de waarde van de cuisine selectie.
+    // Neem het selectie element.
+    const cuisineSelectionElement = document.getElementById(`cuisine-selection`);
+    const cuisineValue = cuisineSelectionElement.value;
+    if (cuisineValue != `No preference`) {
+        apiQueryString += `&cuisine=${cuisineValue}`;
+        searchSummary += `, ${cuisineValue} keuken`;
+    }
+
+    // Valideer de waarde van de diet selectie.
+    // Neem het selectie element.
+    const dietSelectionElement = document.getElementById(`diet-selection`);
+    const dietValue = dietSelectionElement.value;
+    if (dietValue != `None`) {
+        apiQueryString += `&diet=${dietValue}`;
+        searchSummary += `, ${dietValue} dieet`;
+    }
+
+    if (validInput) {
+        // Geef de query en de zoekopdracht aan de functie die de zoekopdracht uitvoert.
+        await fetchData(apiQueryString, searchSummary);
+    }
+
+    // Maak het tekstveld weer leeg.
+    // queryTextFieldElement.value = ``;
+    // preparationTimeTextFieldElement.value = ``;
+}
+
+
+// ******** VANAF HIER : GEMEENSCHAPPELIJKE CODE VOOR EENVOUDIG EN UITGEBREID ZOEKEN ********
 
 // Controleer of "text" een geldige zoekterm is en geef indien nodig gepaste foutmeldingen.
 function validTextQuery(text) {
@@ -71,19 +236,31 @@ function validCharacters(text) {
     return true;
 }
 
+// Controleer of "text" een positief getal vertegenwoordigt.
+// Toegestaan zijn de karakters met een code in het bereik: (48 <= code <= 57)
+function isPositiveNumber(text) {
+    for (let i = 0; i < text.length; i++) {
+        let code = text.charCodeAt(i);
+        if (code < 48 || code > 57) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Het array waarin de resultaten zullen worden gezet
 let receivedResults = null;
 
 // Probeer externe data op te halen die overeenkomen met de zoekopdracht.
-async function fetchData(searchString) {
-    // alert(`function call fetchData(${searchString}) !`);
+async function fetchData(apiQueryString, searchSummary) {
+    // alert(`function call fetchData(${searchSummary}) !`);
     // Geef gebruikersfeedback.
     resultsElement.innerHTML = `Zoekopdracht wordt uitgevoerd...`;
     // Probeer externe data op te halen.
     try {
-        // Doe een spoonacular request met searchString als zoekterm.
+        // Doe een spoonacular request met apiQueryString.
         // Ontvang de response in variabele response.
-        const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&addRecipeInformation=true&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
+        const response = await axios.get(apiQueryString);
         // const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch?query=${searchString}&number=4&apiKey=ada1ef8535a14d7695ff0ba52516335a`);
         // Toon het resultaat in de console.
         console.log(response);
@@ -97,12 +274,12 @@ async function fetchData(searchString) {
         } else {
             if (receivedResults.length===0) {
                 // Geen resultaten ontvangen
-                helpTextElement.innerHTML = `Geen resultaten voor zoekterm ${searchString}.`;
+                helpTextElement.innerHTML = `Geen resultaten voor ${searchSummary}.`;
                 resultsElement.innerHTML = ``;
             } else {
                 resultsElement.innerHTML = `
-                    Resultaten voor zoekterm ${searchString}
-                    <div id="gallery">Galerij</div>
+                    Resultaten voor ${searchSummary}:
+                <div id="gallery">Galerij</div>
                 `;
                 galleryElement = document.getElementById(`gallery`);
 
