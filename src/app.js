@@ -6,6 +6,17 @@ const resultsElement = document.getElementById(`searchresults`);
 let galleryElement = null;
 const selectedResultElement = document.getElementById(`selectedresult`);
 
+// Injecteer een overzicht van de meest populaire recepten op aanvraag van de betreffende pagina.
+window.startMostPopular = async function() {
+    document.getElementById(`searchform`).innerHTML = `
+    <div id="form-help-text"></div>
+  `;
+    let apiQueryString = `https://api.spoonacular.com/recipes/complexSearch?query=cheese&number=7&addRecipeInformation=true&sort=popularity&sortDirection=desc&apiKey=ada1ef8535a14d7695ff0ba52516335a`;
+    let searchSummary = `populaire recepten`;
+    // Geef de query en de zoekopdracht aan de functie die de zoekopdracht uitvoert.
+    await fetchData(apiQueryString, searchSummary);
+}
+
 // Injecteer het zoekformulier voor eenvoudig zoeken op aanvraag van de betreffende pagina.
 window.startSimpleSearch = function() {
     document.getElementById(`searchform`).innerHTML = `
@@ -359,6 +370,11 @@ function showResults(offset) {
         if (receivedResults[resultIndex].readyInMinutes) {
             readyTimeLine = `<div class="preparationtime">Bereidingstijd: ${receivedResults[resultIndex].readyInMinutes} minuten</div>`;
         }
+        // Populariteit
+        let popularityLine = `<div class="popularity">Aantal likes niet gevonden.</div>`;
+        if (receivedResults[resultIndex].aggregateLikes) {
+            popularityLine = `<div class="popularity">${receivedResults[resultIndex].aggregateLikes} likes</div>`;
+        }
         // Injecteer de informatie uit het zoekresultaat als html.
         galleryElement.innerHTML += `
                        <div class="resultbox" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
@@ -366,6 +382,7 @@ function showResults(offset) {
                         ${titleLine}
                         ${imageLine}
                         ${readyTimeLine}
+                        ${popularityLine}
                        </div>
                       `;
     }
