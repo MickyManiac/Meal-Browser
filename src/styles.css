@@ -83,7 +83,6 @@ div#gallery {
 
 div.arrow {
     align-self: center;
-    border: 1px dashed black;
     width: 5%;
     text-align: center;
     font-size: 400%;
@@ -93,19 +92,21 @@ div.arrow {
 
 div.arrow:hover {
     cursor: pointer;
+    color: black;
     font-weight: bold;
 }
 
 div.resultbox {
     margin: auto 5px auto 5px;
-    border: 1px solid black;
+    border: 1px solid grey;
     padding: 5px;
     width: 27%;
 }
 
 div.resultbox:hover {
     cursor: pointer;
-    border: 2px solid black;
+    border: 3px solid black;
+    padding: 3px;
     font-weight: bold;
 }
 

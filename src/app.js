@@ -11,9 +11,13 @@ window.startMostPopular = async function() {
     document.getElementById(`searchform`).innerHTML = `
     <div id="form-help-text"></div>
   `;
-    let apiQueryString = `https://api.spoonacular.com/recipes/complexSearch?query=cheese&number=7&addRecipeInformation=true&sort=popularity&sortDirection=desc&apiKey=ada1ef8535a14d7695ff0ba52516335a`;
-    let searchSummary = `populaire recepten`;
-    // Geef de query en de zoekopdracht aan de functie die de zoekopdracht uitvoert.
+    // Gebruik deze query om te zoeken naar populaire soepen, salades, burgers, fruitsalades, lasagnes, etc.
+    // let apiQueryString = `https://api.spoonacular.com/recipes/complexSearch?query=fruit salad&number=10&addRecipeInformation=true&sort=popularity&sortDirection=desc&apiKey=ada1ef8535a14d7695ff0ba52516335a`;
+    // Gebruik deze query om in een keer voor een reeks specifieke recepten informatie op te halen.
+    let apiQueryString = `https://api.spoonacular.com/recipes/informationBulk?ids=715562,715419,645348,715495,715560,776505,716429&apiKey=ada1ef8535a14d7695ff0ba52516335a`;
+    let searchSummary = `"burgers"`;
+
+    // Geef de query en de samenvatting van de zoekopdracht aan de functie die de zoekopdracht uitvoert.
     await fetchData(apiQueryString, searchSummary);
 }
 
@@ -120,7 +124,7 @@ async function handleSimpleFormSubmit(evt) {
     if (validTextQuery(textQueryValue)) {
         apiQueryString += `&query=${textQueryValue}`;
         searchSummary += `zoekterm ${textQueryValue}`;
-        // Geef de query en de zoekopdracht aan de functie die de zoekopdracht uitvoert.
+        // Geef de query en de samenvatting van de zoekopdracht aan de functie die de zoekopdracht uitvoert.
         await fetchData(apiQueryString, searchSummary);
     }
 
@@ -192,7 +196,7 @@ async function handleAdvancedFormSubmit(evt) {
     }
 
     if (validInput) {
-        // Geef de query en de zoekopdracht aan de functie die de zoekopdracht uitvoert.
+        // Geef de query en de samenvatting van de zoekopdracht aan de functie die de zoekopdracht uitvoert.
         await fetchData(apiQueryString, searchSummary);
     }
 
@@ -276,7 +280,12 @@ async function fetchData(apiQueryString, searchSummary) {
         // Toon het resultaat in de console.
         console.log(response);
         // Zet het hier benodigde deel van de response in variabele receivedResults.
-        receivedResults = response.data.results;
+        // De strutuur van de response is afhankelijk van het gebruikte endpoint.
+        if (response.data.results) {
+            receivedResults = response.data.results;
+        } else {
+            receivedResults = response.data;
+        }
         // Controleer of er bruikbare resultaten zijn ontvangen
         if (!receivedResults) {
             // Geen resultaten ontvangen
@@ -452,14 +461,14 @@ window.fetchRecipe = async function(recipeId) {
                 }
                 ingredientsSection += `</div>`;
             } else if (receivedResult.sourceUrl) {
-                ingredientsSection = `<div class="recipesection">Bekijk de ingredi&euml;nten voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
+                ingredientsSection = `<div class="recipesection">Ingredi&euml;nten</div><div>Bekijk de ingredi&euml;nten voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
             }
             // Bereidingswijze
             let instructionsSection = `<div class="recipesection">Geen bereidingswijze gevonden voor dit recept.</div>`;
             if (receivedResult.instructions) {
                 instructionsSection = `<div class="recipesection">Bereidingswijze</div><div>${receivedResult.instructions}</div>`;
             } else if (receivedResult.sourceUrl) {
-                instructionsSection = `<div class="recipesection">Bekijk de bereidingswijze voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
+                instructionsSection = `<div class="recipesection">Bereidingswijze</div><div>Bekijk de bereidingswijze voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
             }
             // Externe link
             let sourceUrlSection = `<div class="recipesection">Geen externe link gevonden voor dit recept.</div>`;
