@@ -526,7 +526,7 @@ var _axiosDefault = parcelHelpers.interopDefault(_axios);
 document.getElementById(`simple-search-form`).addEventListener("submit", handleTextQuery);
 // Neem de elementen waarin html fragmenten geinjecteerd gaan worden.
 const helpTextElement = document.getElementById(`simple-search-help-text`);
-const resultsElement = document.getElementById(`searchresults`);
+const resultsElement = document.getElementById(`search-results`);
 let galleryElement = null;
 const selectedResultElement = document.getElementById(`selectedresult`);
 // Verwerk de zoekopdracht.
@@ -651,20 +651,20 @@ function showResults(offset1) {
         let idLine = `<div>---</div>`;
         if (receivedResults[resultIndex].id) idLine = `<div>${receivedResults[resultIndex].id}</div>`;
         // Receptnaam
-        let titleLine = `<div class="recipename">Receptnaam niet gevonden.</div>`;
-        if (receivedResults[resultIndex].title) titleLine = `<div class="recipename">${receivedResults[resultIndex].title}</div>`;
+        let titleLine = `<div class="recipe-name">Receptnaam niet gevonden.</div>`;
+        if (receivedResults[resultIndex].title) titleLine = `<div class="recipe-name">${receivedResults[resultIndex].title}</div>`;
         // Afbeelding
-        let imageLine = `<div class="imagebox"><img class="icon" alt="No food picture found." src="../images/NoImageFound.gif"></div>`;
+        let imageLine = `<div class="image-box"><img class="icon" alt="No food picture found." src="../images/NoImageFound.gif"></div>`;
         if (receivedResults[resultIndex].image) {
-            if (receivedResults[resultIndex].title) imageLine = `<div class="imagebox"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>`;
-            else imageLine = `<div class="imagebox"><img class="icon" alt="" src="${receivedResults[resultIndex].image}"></div>`;
+            if (receivedResults[resultIndex].title) imageLine = `<div class="image-box"><img class="icon" alt="${receivedResults[resultIndex].title}" src="${receivedResults[resultIndex].image}"></div>`;
+            else imageLine = `<div class="image-box"><img class="icon" alt="" src="${receivedResults[resultIndex].image}"></div>`;
         }
         // Bereidingstijd
-        let readyTimeLine = `<div class="preparationtime">Bereidingstijd niet gevonden.</div>`;
-        if (receivedResults[resultIndex].readyInMinutes) readyTimeLine = `<div class="preparationtime">Bereidingstijd: ${receivedResults[resultIndex].readyInMinutes} minuten</div>`;
+        let readyTimeLine = `<div class="preparation-time">Bereidingstijd niet gevonden.</div>`;
+        if (receivedResults[resultIndex].readyInMinutes) readyTimeLine = `<div class="preparation-time">Bereidingstijd: ${receivedResults[resultIndex].readyInMinutes} minuten</div>`;
         // Injecteer de informatie uit het zoekresultaat als html.
         galleryElement.innerHTML += `
-                       <div class="resultbox" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
+                       <div class="result-box" onclick="fetchRecipe(${receivedResults[resultIndex].id})">
                         ${idLine}
                         ${titleLine}
                         ${imageLine}
@@ -695,36 +695,36 @@ window.fetchRecipe = async function(recipeId) {
         selectedResultElement.innerHTML = `<hr>Geen verdere informatie gevonden voor dit recept.`;
         else {
             // Verwerk de informatie uit het zoekresultaat in html fragmenten.
-            let titleSection = `<div class="recipetitle">Geen receptnaam gevonden.</div>`;
-            if (receivedResult.title) titleSection = `<div class="recipetitle">${receivedResult.title}</div>`;
+            let titleSection = `<div class="recipe-title">Geen receptnaam gevonden.</div>`;
+            if (receivedResult.title) titleSection = `<div class="recipe-title">${receivedResult.title}</div>`;
             // Afbeelding
             let imageSection = ``;
             if (receivedResult.image) {
-                if (receivedResult.title) imageSection = `<div class="recipesection"><img class="recipeimage" alt="${receivedResult.title}" src="${receivedResult.image}"></div>`;
-                else imageSection = `<div class="recipesection"><img class="recipeimage" alt="" src="${receivedResult.image}"></div>`;
+                if (receivedResult.title) imageSection = `<div class="recipe-section"><img class="recipe-image" alt="${receivedResult.title}" src="${receivedResult.image}"></div>`;
+                else imageSection = `<div class="recipe-section"><img class="recipe-image" alt="" src="${receivedResult.image}"></div>`;
             }
             // Bereidingstijd
-            let readyTimeSection = `<div class="recipesection">Geen bereidingstijd gevonden voor dit recept.</div>`;
-            if (receivedResult.readyInMinutes) readyTimeSection = `<div class="recipesection">Bereidingstijd</div><div>${receivedResult.readyInMinutes} minuten</div>`;
+            let readyTimeSection = `<div class="recipe-section">Geen bereidingstijd gevonden voor dit recept.</div>`;
+            if (receivedResult.readyInMinutes) readyTimeSection = `<div class="recipe-section">Bereidingstijd</div><div>${receivedResult.readyInMinutes} minuten</div>`;
             // Aantal porties
             let nrServings = receivedResult.servings;
             // Ingredienten
-            let ingredientsSection = `<div class="recipesection">Geen ingredi&euml;nten gevonden voor dit recept.</div>`;
+            let ingredientsSection = `<div class="recipe-section">Geen ingredi&euml;nten gevonden voor dit recept.</div>`;
             if (receivedResult.extendedIngredients && receivedResult.extendedIngredients.length > 0) {
                 if (nrServings) {
-                    if (nrServings === 1) ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor 1 portie</div><div>`;
-                    if (nrServings > 1) ingredientsSection = `<div class="recipesection">Ingredi&euml;nten voor ${nrServings} porties</div><div>`;
-                } else ingredientsSection = `<div class="recipesection">Ingredi&euml;nten</div><div>`;
+                    if (nrServings === 1) ingredientsSection = `<div class="recipe-section">Ingredi&euml;nten voor 1 portie</div><div>`;
+                    if (nrServings > 1) ingredientsSection = `<div class="recipe-section">Ingredi&euml;nten voor ${nrServings} porties</div><div>`;
+                } else ingredientsSection = `<div class="recipe-section">Ingredi&euml;nten</div><div>`;
                 for(let i = 0; i < receivedResult.extendedIngredients.length; i++)ingredientsSection += `${receivedResult.extendedIngredients[i].original}<br>`;
                 ingredientsSection += `</div>`;
-            } else if (receivedResult.sourceUrl) ingredientsSection = `<div class="recipesection">Bekijk de ingredi&euml;nten voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
+            } else if (receivedResult.sourceUrl) ingredientsSection = `<div class="recipe-section">Bekijk de ingredi&euml;nten voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
             // Bereidingswijze
-            let instructionsSection = `<div class="recipesection">Geen bereidingswijze gevonden voor dit recept.</div>`;
-            if (receivedResult.instructions) instructionsSection = `<div class="recipesection">Bereidingswijze</div><div>${receivedResult.instructions}</div>`;
-            else if (receivedResult.sourceUrl) instructionsSection = `<div class="recipesection">Bekijk de bereidingswijze voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
+            let instructionsSection = `<div class="recipe-section">Geen bereidingswijze gevonden voor dit recept.</div>`;
+            if (receivedResult.instructions) instructionsSection = `<div class="recipe-section">Bereidingswijze</div><div>${receivedResult.instructions}</div>`;
+            else if (receivedResult.sourceUrl) instructionsSection = `<div class="recipe-section">Bekijk de bereidingswijze voor dit recept op <a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a>.</div>`;
             // Externe link
-            let sourceUrlSection = `<div class="recipesection">Geen externe link gevonden voor dit recept.</div>`;
-            if (receivedResult.sourceUrl) sourceUrlSection = `<div class="recipesection">Bron</div><div><a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a></div>`;
+            let sourceUrlSection = `<div class="recipe-section">Geen externe link gevonden voor dit recept.</div>`;
+            if (receivedResult.sourceUrl) sourceUrlSection = `<div class="recipe-section">Bron</div><div><a href="${receivedResult.sourceUrl}" target="_blank">${receivedResult.sourceUrl}</a></div>`;
             // Injecteer de informatie uit het zoekresultaat als html.
             selectedResultElement.innerHTML = `
                 <hr>

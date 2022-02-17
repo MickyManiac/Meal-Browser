@@ -1,16 +1,17 @@
 body {
     width: 90%;
     margin: auto;
+    font-family: cursive;
 }
 
 /************************************************************************************************/
 
-.navbar {
+nav.navigation-bar {
   background-color: #333;
   overflow: hidden;
 }
 
-.navbar a {
+nav.navigation-bar a {
   float: left;
   display: block;
   color: #f2f2f2;
@@ -20,29 +21,27 @@ body {
   font-size: 17px;
 }
 
-.navbar a:hover {
+nav.navigation-bar a:hover {
   background-color: #dddddd;
   color: black;
 }
 
-.navbar a.active {
+nav.navigation-bar a.active {
   background-color: #04AA6D;
   color: white;
 }
 
 /************************************************************************************************/
 
-h1 {
+h1.page-title {
     text-align: center;
-    font-family: cursive;
 }
 
-p {
+p.meal-browser-text {
     text-align: center;
-    font-family: cursive;
 }
 
-img.centeredimage {
+img.centered-smiley {
     display: block;
     margin: auto;
     width: 20%;
@@ -51,9 +50,16 @@ img.centeredimage {
 
 /************************************************************************************************/
 
+form {
+    padding: 10px 0px 10px 0px;
+}
+
+fieldset {
+    padding: 20px 10px 20px 15px;
+}
 
 #form-help-text {
-    padding: 5px;
+    padding: 5px 5px 5px 18px;
     color: red;
     font-weight: bold;
 }
@@ -61,7 +67,7 @@ img.centeredimage {
 span.symbol {
     border: 1px solid red;
     padding: 2px;
-    font-family: monospace;
+    font-family: Lucida Console, monospace;
 }
 
 span.quoted {
@@ -70,7 +76,13 @@ span.quoted {
 
 /************************************************************************************************/
 
-div#searchresults {
+section#search-results {
+    margin: 0px 0px 15px 0px;
+}
+
+div#results-feedback {
+    padding: 15px 0px 0px 0px;
+    border-top: 2px solid #444444;
 }
 
 div#gallery {
@@ -78,7 +90,8 @@ div#gallery {
     align-items: center;
     justify-content: center;
     align-items: stretch;
-    border: 1px dashed black;
+    padding: 15px 0px 15px 0px;
+    border-bottom: 2px solid #444444;
 }
 
 div.arrow {
@@ -86,7 +99,6 @@ div.arrow {
     width: 5%;
     text-align: center;
     font-size: 400%;
-    font-family: cursive;
     color: grey;
 }
 
@@ -96,30 +108,57 @@ div.arrow:hover {
     font-weight: bold;
 }
 
-div.resultbox {
+div.result-box {
     margin: auto 5px auto 5px;
     border: 1px solid grey;
     padding: 5px;
     width: 27%;
+    font-family: Verdana, Sans-serif;
 }
 
-div.resultbox:hover {
+div.result-box:hover {
     cursor: pointer;
     border: 3px solid black;
     padding: 3px;
     font-weight: bold;
 }
 
-div.recipename {
+div.no-recipe-id {
+    color: #666666;
+}
+
+div.recipe-name {
     height: 40px;
 }
 
-div.preparationtime {
+div.no-recipe-name {
+    height: 40px;
+    color: #666666;
+}
+
+div.preparation-time {
     display: box;
     padding: 10px 0px 0px 0px;
 }
 
-div.imagebox {
+div.no-preparation-time {
+    display: box;
+    padding: 10px 0px 0px 0px;
+    color: #666666;
+}
+
+div.popularity {
+    display: box;
+    padding: 2px 0px 0px 0px;
+}
+
+div.no-popularity {
+    display: box;
+    padding: 2px 0px 0px 0px;
+    color: #666666;
+}
+
+div.image-box {
     display: flex;
     max-height: 200px;
     overflow: hidden;
@@ -134,21 +173,38 @@ img.icon {
 
 /************************************************************************************************/
 
-div.selectedresult {
+article.recipe-details {
+    margin: 5px 0px 15px 0px;
+    border-bottom: 2px solid #444444;
+    padding: 0px 0px 15px 0px;
+    font-family: Verdana, Sans-serif;
 }
 
-div.recipetitle {
+div.recipe-title {
     margin: 5px 0px 0px 0px;
     font-weight: bold;
     font-size: 140%;
 }
 
-div.recipesection {
+div.no-recipe-title {
+    margin: 5px 0px 0px 0px;
+    font-weight: bold;
+    font-size: 140%;
+    color: #666666;
+}
+
+div.recipe-section {
     margin: 5px 0px 0px 0px;
     font-weight: bold;
 }
 
-img.recipeimage {
+div.empty-recipe-section {
+    margin: 5px 0px 0px 0px;
+    font-weight: bold;
+    color: #666666;
+}
+
+img.recipe-image {
     display: block;
     margin: 5px;
     max-width: 50%;

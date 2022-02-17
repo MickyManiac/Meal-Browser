@@ -6,18 +6,20 @@
     <title>Meal Browser | Simple Search</title>
 </head>
 <body onload="startSimpleSearch()">
-<nav class="navbar">
+<nav class="navigation-bar">
   <a href="index.html">Meal Browser</a>
   <a href="simplesearch.html" class="active">Eenvoudig zoeken</a>
   <a href="advancedsearch.html">Uitgebreid zoeken</a>
   <a href="mostpopular.html">Populaire recepten</a>
 </nav>
-<h1>Eenvoudig zoeken naar recepten</h1>
-<hr>
-<div id="searchform"></div>
-<hr>
-<div id="searchresults"></div>
-<div id="selectedresult"></div>
+<header>
+ <h1 class="page-title">Eenvoudig zoeken naar recepten</h1>
+ <div id="searchform"></div>
+</header>
+<main>
+ <section id="search-results"></section>
+ <article id="selectedresult"></article>
+</main>
 
 <script type="module" src="app.js"></script>
 </body>
