@@ -1,6 +1,11 @@
-#Meal Browser installatiehandleiding
+# Meal Browser installatiehandleiding #
 
-## Inleiding
+## Inhoud ##
+
+* [Inleiding](#inleiding)
+* [Installeren en starten](#installeren-en-starten)
+
+## Inleiding ##
 
 Meal Browser is een web applicatie die het mogelijjk maakt om naar recepten te zoeken.
 Daartoe maakt Meal Browser gebruik van de spoonacular API.
@@ -19,11 +24,13 @@ Mediterraanse keuken die binnen 60  minuten bereid kan worden.
 Ten slotte kan de gebruiker zich laten inspireren door een actueel overzicht van populaire recepten, die bij
 menige tafelgast in de smaak zullen vallen.
 
-## Installeren
+## Installeren en starten ##
 
-Om Meal Browser te installeren kunnen de volgende stappen worden gevolgd.  
-* Clone dit project. 
-* NPM, Parcel en Axios zijn al geconfigureerd.  
+Volg de volgende stappen om Meal Browser te installeren en te starten.  
+1. Clone dit project.
+2. NPM, Parcel en Axios zijn al geconfigureerd.  
 Geef om de bijbehorende dependencies te installeren het commando `npm install`.
-* De benodigde API key is al verwerkt in de code.
-* Om de applicatie te starten, geef je het commando `npm run start`.
+3. Wanneer NPM vulnerabilities rapporteert kunnen deze worden verholpen met `npm audit fix`. Volg hiervoor de instructies.
+4. De benodigde API key is al verwerkt in de code.  
+Daarvoor is dus geen verdere actie nodig.
+5. Geef om de applicatie te starten het commando `npm run start`.
