@@ -28,9 +28,9 @@ menige tafelgast in de smaak zullen vallen.
 
 Volg de volgende stappen om Meal Browser te installeren en te starten.  
 1. Clone dit project.
-2. NPM, Parcel en Axios zijn al geconfigureerd.  
-Geef om de bijbehorende dependencies te installeren het commando `npm install`.
-3. Wanneer NPM vulnerabilities rapporteert kunnen deze worden verholpen met `npm audit fix`. Volg hiervoor de instructies.
-4. De benodigde API key is al verwerkt in de code.  
-Daarvoor is dus geen verdere actie nodig.
+2. NPM, Parcel en Axios zijn al geconfigureerd. Geef om de bijbehorende dependencies te installeren het commando
+`npm install`.
+3. Wanneer NPM vulnerabilities rapporteert kunnen deze worden verholpen met `npm audit fix`. Volg hiervoor de
+instructies.
+4. De benodigde API key is al verwerkt in de code. Hiervoor is dus geen verdere actie nodig.
 5. Geef om de applicatie te starten het commando `npm run start`.
